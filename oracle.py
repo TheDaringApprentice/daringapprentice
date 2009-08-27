@@ -1,4 +1,6 @@
 # Copyright The Daring Apprentice 2009 --- thedaringapprentice@gmail.com
+# http://github.com/TheDaringApprentice/daringapprentice/tree/master
+# git://github.com/TheDaringApprentice/daringapprentice.git
 
 def loadOraclefile(fileparameter):
     '''

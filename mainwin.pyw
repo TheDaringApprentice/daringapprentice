@@ -11,6 +11,10 @@ except ImportError:
     sys.exit(1)
     
 class GLWidget(QtOpenGL.QGLWidget):
+    
+    # Only for now, eventually we'll have the real interface here 
+    # (maybe in a seperate physical file, especially as click dragging etc.
+    # needs to be implemented.)
     xRotationChanged = QtCore.pyqtSignal(int)
     yRotationChanged = QtCore.pyqtSignal(int)
     zRotationChanged = QtCore.pyqtSignal(int)
@@ -27,7 +31,7 @@ class GLWidget(QtOpenGL.QGLWidget):
 
         self.trolltechGreen = QtGui.QColor.fromCmykF(0.40, 0.0, 1.0, 0.0)
         self.trolltechPurple = QtGui.QColor.fromCmykF(0.39, 0.39, 0.0, 0.0)
-
+        
     def minimumSizeHint(self):
         return QtCore.QSize(50, 50)
 
@@ -57,6 +61,7 @@ class GLWidget(QtOpenGL.QGLWidget):
 
     def initializeGL(self):
         self.qglClearColor(self.trolltechPurple.dark())
+        # self.qglClearColor(self.black()) # HELP! I want this in black
         self.object = self.makeObject()
         GL.glShadeModel(GL.GL_FLAT)
         GL.glEnable(GL.GL_DEPTH_TEST)
@@ -242,63 +247,123 @@ class MainWindow(QtGui.QMainWindow):
         
     def createDockWindows(self):
         
-        '''
-            Here we create the "Activity Log" docking window.
-            It is a RichText Box (QTextEdit), with a line edit and a send button below it
-        '''
+        # HELP! Preferably, I'd like to load the positions of all the dock windows
+        # from a file, and restore them upon reopening the application.
+                
         dock = QtGui.QDockWidget(self.tr("Activity Log"), self)
         dock.setAllowedAreas(
                         QtCore.Qt.LeftDockWidgetArea |
                         QtCore.Qt.RightDockWidgetArea |
                         QtCore.Qt.BottomDockWidgetArea )
         
-        self.LogV = QtGui.QWidget(dock)         # the Bigger docking widget
-        self.LogLayout = QtGui.QVBoxLayout()    # the Vert layout for the log dock
-        self.LogText = QtGui.QTextEdit()        # Where the log is stored
-        # self.LogText.enabled = False        # HELP! This widget should be read only (though copy and paste is good)
+        if True:  # So we can code fold on the Activity Log
+            '''
+                Here we create the "Activity Log" docking window.
+                It is a RichText Box (QTextEdit), with a line edit and a send button
+                below it.
+            '''
         
-        self.LogH = QtGui.QWidget()             # the widget for the send button and text
-        self.LogHLayout = QtGui.QHBoxLayout()   # the Horz layout for the send boxes 
-        self.LogSend = QtGui.QLineEdit(self.tr("Type in text here to chat!"))
-        self.LogBtnSend = QtGui.QPushButton(self.tr("Send"))
-        self.LogHLayout.addWidget(self.LogSend)
-        self.LogHLayout.addWidget(self.LogBtnSend)
-        self.LogH.setLayout(self.LogHLayout)
+            self.LogV = QtGui.QWidget(dock)         # the Bigger docking widget
+            # self.LogV.sizePolicy(QSizePolicy.Minimum)
+            self.LogLayout = QtGui.QVBoxLayout()    # the Vert layout for the log dock
+            self.LogLayout.setSpacing(1)
+            self.LogText = QtGui.QTextEdit()        # Where the log is stored
+            # self.LogText.enabled = False          # HELP! This widget should be read only
+                                                    # though it's good to have copy and paste.
         
-        self.LogLayout.addWidget(self.LogText)
-        self.LogLayout.addWidget(self.LogH)
-        self.LogV.setLayout(self.LogLayout)
+            self.LogH = QtGui.QWidget()             # the widget for the send button and text
+            self.LogHLayout = QtGui.QHBoxLayout()   # the Horz layout for the send boxes
+            self.LogHLayout.setSpacing(1)
+            self.LogSend = QtGui.QLineEdit(self.tr("Type in text here to chat!"))
+            self.LogBtnSend = QtGui.QPushButton(self.tr("Send"))
+            self.LogHLayout.addWidget(self.LogSend)
+            self.LogHLayout.addWidget(self.LogBtnSend)
+            self.LogH.setLayout(self.LogHLayout)
+        
+            self.LogLayout.addWidget(self.LogText)
+            self.LogLayout.addWidget(self.LogH)
+            self.LogV.setLayout(self.LogLayout)
                                        
-        dock.setWidget(self.LogV)
-        self.addDockWidget(QtCore.Qt.BottomDockWidgetArea, dock)
-        self.viewMenu.addAction(dock.toggleViewAction())
+            dock.setWidget(self.LogV)
+            self.addDockWidget(QtCore.Qt.BottomDockWidgetArea, dock)
+            self.viewMenu.addAction(dock.toggleViewAction())
         
+        if True:  # So we can code fold on the Hand Dock
+            '''
+                Here we create a Hand Station.
+                It is where the player will have all his cards, and can untap, draw,
+                set life, and end his turn.
+            '''
+            dock = QtGui.QDockWidget(self.tr("Player1's Hand"), self)
+            self.HandDock1 = QtGui.QWidget(dock)
+            self.HandLayout = QtGui.QHBoxLayout()
+            self.HandLayout.setSpacing(1)
+            self.HandTree = QtGui.QTreeWidget()
+            labels = QtCore.QStringList()
+            labels << self.tr("Cardname") << self.tr("Cost")
+            self.HandTree.setHeaderLabels(labels)
+            # self.HandTree.header().minimumSectionSize = 30  # HELP! I want to make
+            # the "Cost" column's width much smaller by default.
+            
+            self.HandTree.rootIsDecorated = False
+            self.HandTree.alternatingRowColors = True
+            self.HandLayout.addWidget(self.HandTree)
+            
+            # HELP! The HandAction buttons are *way* too big, they should be tight,
+            # and preferably have some icons on them!
+            self.HandActionDock = QtGui.QWidget()
+            self.HandActionLayout = QtGui.QVBoxLayout()
+            self.HandActionLayout.setSpacing(1)
+            self.UntapAll = QtGui.QPushButton("Untap All")
+            self.DrawCard = QtGui.QPushButton("Draw")
+            self.CreateToken = QtGui.QPushButton("Create Token")
+            self.EndTurn = QtGui.QPushButton("End Turn")
+            
+            self.LifeDock = QtGui.QWidget()
+            self.LifeLayout = QtGui.QHBoxLayout()
+            self.LifeLayout.setSpacing(1)
+            self.LifePlus = QtGui.QPushButton("+")
+            self.LifeMinus = QtGui.QPushButton("-")
+            
+            self.LifeLayout.addWidget(self.LifePlus)
+            self.LifeLayout.addWidget(self.LifeMinus)
+            
+            self.LifeDock.setLayout(self.LifeLayout)
+            
+            self.HandActionLayout.addWidget(self.UntapAll)
+            self.HandActionLayout.addWidget(self.DrawCard)
+            self.HandActionLayout.addWidget(self.CreateToken)
+            self.HandActionLayout.addWidget(self.EndTurn)
+            self.HandActionLayout.addWidget(self.LifeDock)
+            
+            self.HandActionDock.setLayout(self.HandActionLayout)
+            
+            self.HandLayout.addWidget(self.HandActionDock)
+ 
+            self.HandDock1.setLayout(self.HandLayout)
+            
+            dock.setWidget(self.HandDock1)
+            self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, dock)
+            self.viewMenu.addAction(dock.toggleViewAction())
         
-        '''
-            Here we create the "Card Info" box.
-            It is where the Card's Name, and all other info will be displayed
-        '''
-        dock = QtGui.QDockWidget(self.tr("Card Info"), self)
-        self.CardDock = QtGui.QTextEdit(dock)
-        
-        dock.setWidget(self.CardDock)
-        self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, dock)
-        self.viewMenu.addAction(dock.toggleViewAction())
-        
-        '''
-            Here we create a Hand Station.
-            It is where the player will have all his cards, and can untap, draw,
-            set life, and end his turn.
-        '''
-        dock = QtGui.QDockWidget(self.tr("Player1's Hand"), self)
-        self.HandDock1 = QtGui.QWidget(dock)
-        
-        
-        
-        dock.setWidget(self.CardDock)
-        self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, dock)
-        self.viewMenu.addAction(dock.toggleViewAction())
-        
+        if True: # So we can code fold on the Card Info
+            '''
+                Here we create the "Card Info" box.
+                It is where the Card's Name, and all other info will be displayed.
+                
+                Note that it is important that we add the Card box last, as this
+                makes that the dock is below the hand(s) in the docking area.
+            '''
+            dock = QtGui.QDockWidget(self.tr("Card Info"), self)
+            self.CardDock = QtGui.QWidget(dock)
+            self.CardLayout = QtGui.QHBoxLayout()
+            self.CardText = QtGui.QTextEdit()
+            self.CardLayout.addWidget(self.CardText)
+            self.CardDock.setLayout(self.CardLayout)
+            
+            dock.setWidget(self.CardDock)
+            self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, dock)
+            self.viewMenu.addAction(dock.toggleViewAction())
 
         
 if __name__ == '__main__':
