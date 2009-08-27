@@ -192,6 +192,7 @@ class MainWindow(QtGui.QMainWindow):
         self.createToolBars()
         self.createStatusBar()
         self.createDockWindows()
+        self.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.MinimumExpanding)
         
         # Add the OpenGL widget
         self.glWidget = GLWidget()
@@ -204,9 +205,9 @@ class MainWindow(QtGui.QMainWindow):
         
     def about(self):
         QtGui.QMessageBox.about(self, self.tr("About Daring Apprentice"),
-            self.tr("<a href=http://daringapprentice.wikispaces.com>Daring Apprentice</a>"
+            self.tr("<a href=http://daringapprentice.wikispaces.com>Daring Apprentice</a><br>"
                 "A temporary about box, until I have something better. "
-                "--- <b>The Daring Apprentice</b>"))
+                "<br><br>--- <b>The Daring Apprentice</b>"))
             
     def createActions(self):
         '''
@@ -268,6 +269,8 @@ class MainWindow(QtGui.QMainWindow):
             self.LogLayout = QtGui.QVBoxLayout()    # the Vert layout for the log dock
             self.LogLayout.setSpacing(1)
             self.LogText = QtGui.QTextEdit()        # Where the log is stored
+            self.LogText.sizeHint().setHeight(60)
+            # self.LogText.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
             # self.LogText.enabled = False          # HELP! This widget should be read only
                                                     # though it's good to have copy and paste.
         
@@ -275,7 +278,8 @@ class MainWindow(QtGui.QMainWindow):
             self.LogHLayout = QtGui.QHBoxLayout()   # the Horz layout for the send boxes
             self.LogHLayout.setSpacing(1)
             self.LogSend = QtGui.QLineEdit(self.tr("Type in text here to chat!"))
-            self.LogBtnSend = QtGui.QPushButton(self.tr("Send"))
+            self.LogBtnSend = QtGui.QToolButton()
+            self.LogBtnSend.setText("Send")
             self.LogHLayout.addWidget(self.LogSend)
             self.LogHLayout.addWidget(self.LogBtnSend)
             self.LogH.setLayout(self.LogHLayout)
@@ -294,17 +298,20 @@ class MainWindow(QtGui.QMainWindow):
                 It is where the player will have all his cards, and can untap, draw,
                 set life, and end his turn.
             '''
+            
+            # TODO: make this a class, and call it X times for the amount of players
             dock = QtGui.QDockWidget(self.tr("Player1's Hand"), self)
+            # dock.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.MinimumExpanding)
             self.HandDock1 = QtGui.QWidget(dock)
             self.HandLayout = QtGui.QHBoxLayout()
-            self.HandLayout.setSpacing(1)
+            self.HandLayout.setSpacing(0)
             self.HandTree = QtGui.QTreeWidget()
             labels = QtCore.QStringList()
             labels << self.tr("Cardname") << self.tr("Cost")
             self.HandTree.setHeaderLabels(labels)
-            # self.HandTree.header().minimumSectionSize = 30  # HELP! I want to make
-            # the "Cost" column's width much smaller by default.
-            
+            self.HandTree.setColumnWidth(0, 120)
+            self.HandTree.setColumnWidth(1, 40)
+            # self.HandTree.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
             self.HandTree.rootIsDecorated = False
             self.HandTree.alternatingRowColors = True
             self.HandLayout.addWidget(self.HandTree)
@@ -312,8 +319,8 @@ class MainWindow(QtGui.QMainWindow):
             # HELP! The HandAction buttons are *way* too big, they should be tight,
             # and preferably have some icons on them!
             self.HandActionDock = QtGui.QWidget()
+            # self.HandActionDock.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
             self.HandActionLayout = QtGui.QVBoxLayout()
-            self.HandActionLayout.setSpacing(1)
             self.UntapAll = QtGui.QPushButton("Untap All")
             self.DrawCard = QtGui.QPushButton("Draw")
             self.CreateToken = QtGui.QPushButton("Create Token")
@@ -321,9 +328,13 @@ class MainWindow(QtGui.QMainWindow):
             
             self.LifeDock = QtGui.QWidget()
             self.LifeLayout = QtGui.QHBoxLayout()
-            self.LifeLayout.setSpacing(1)
-            self.LifePlus = QtGui.QPushButton("+")
-            self.LifeMinus = QtGui.QPushButton("-")
+            self.LifeLayout.setSpacing(0)
+            self.LifePlus = QtGui.QToolButton()
+            self.LifePlus.setText("+")
+            self.LifePlus.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Fixed)
+            self.LifeMinus = QtGui.QToolButton()
+            self.LifeMinus.setText("-")
+            self.LifeMinus.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Fixed)
             
             self.LifeLayout.addWidget(self.LifePlus)
             self.LifeLayout.addWidget(self.LifeMinus)
@@ -335,6 +346,10 @@ class MainWindow(QtGui.QMainWindow):
             self.HandActionLayout.addWidget(self.CreateToken)
             self.HandActionLayout.addWidget(self.EndTurn)
             self.HandActionLayout.addWidget(self.LifeDock)
+            aSpacer = QtGui.QWidget()
+            aSpacer.setSizePolicy(QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
+            self.HandActionLayout.addWidget(aSpacer)
+            
             
             self.HandActionDock.setLayout(self.HandActionLayout)
             
@@ -358,6 +373,7 @@ class MainWindow(QtGui.QMainWindow):
             self.CardDock = QtGui.QWidget(dock)
             self.CardLayout = QtGui.QHBoxLayout()
             self.CardText = QtGui.QTextEdit()
+            self.CardText.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.MinimumExpanding)
             self.CardLayout.addWidget(self.CardText)
             self.CardDock.setLayout(self.CardLayout)
             
