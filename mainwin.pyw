@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #!/usr/bin/env python
 from PyQt4 import QtCore, QtGui, QtOpenGL
 import math
@@ -192,7 +193,6 @@ class MainWindow(QtGui.QMainWindow):
         self.createToolBars()
         self.createStatusBar()
         self.createDockWindows()
-        self.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.MinimumExpanding)
         
         # Add the OpenGL widget
         self.glWidget = GLWidget()

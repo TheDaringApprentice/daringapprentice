@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright The Daring Apprentice 2009 --- thedaringapprentice@gmail.com
 # http://github.com/TheDaringApprentice/daringapprentice/tree/master
 # git://github.com/TheDaringApprentice/daringapprentice.git
@@ -14,6 +15,7 @@ def loadOraclefile(fileparameter):
         'Colors': ['Colorless'],
         'Rules Text': "Trample Darksteel Colossus is indestructible. If Darksteel Colossus would be put into a graveyard from anywhere, reveal Darksteel Colossus and shuffle it into its owner's library instead.",
         'Set': ['Magic 2010', 'Darksteel'],
+        'Rarity': 'Rare',
         'Rarity': ['Mythic Rare', 'Rare'],
         'Pow/Tgh': '(11/11)',
         'Power': '11',
@@ -22,7 +24,12 @@ def loadOraclefile(fileparameter):
     '''
 
     # split the data into "cards" --- Split with the "Name: \t" substring
-    data = file(fileparameter).read().replace('Name: \t','<---NewCard--->Name: \t').split('<---NewCard--->')
+    data = file(fileparameter).read()\
+            .replace('Name: \t','<---NewCard--->Name: \t')\
+            .replace('Æ','Ae')\
+            .split('<---NewCard--->')
+            
+            
     print 'Total Cards: ' + str(len(data))
     
     def GetCard(cardno):
@@ -58,6 +65,11 @@ def loadOraclefile(fileparameter):
             
             # Take everything up to the last newline (or all if no more newlines were found)
             Tails.append(aTail[0:lastchar].replace('\n',' '))
+            # This kinda sucks... some \n chars are intentional, and some are just the break.
+            # We either take it with the line breaks, and get weird breaks, or without them
+            # and we sit with activation costs not at the start of the card.  Maybe some
+            # more data cleaning before we run?  
+            
             
         
         # Empty dictionary
@@ -160,7 +172,8 @@ def loadOraclefile(fileparameter):
                 Sets = Sets + [aSet.rpartition(' ')[0].strip()]
                 Rarities = Rarities + [aSet.rpartition(' ')[2].strip().replace('_',' ')]
             card['Set'] = Sets
-            card['Rarity'] = Rarities
+            card['Rarities'] = Rarities
+            # card['Rarity'] = Rarities[len(Rarities)-1]  # I decided I don't need Rarities
             del card['Set/Rarity']
         
         if 'Pow/Tgh' in card:
@@ -193,21 +206,23 @@ def loadOraclefile(fileparameter):
         card1 = cardname + ' (' + cardname.split('//')[0].strip() + ')'
         card2 = cardname + ' (' + cardname.split('//')[1].strip() + ')'
         card = {}
-        card['Name'] = cardname
+        card['Name'] = cardname.strip()
         card['Cost'] = Cards[card1]['Cost'] + ' // ' + Cards[card2]['Cost']
         card['Type'] = Cards[card1]['Type'] + ' // ' + Cards[card2]['Type']
         card['Converted Cost'] = Cards[card1]['Converted Cost'] + Cards[card2]['Converted Cost']
         card['Mono colored'] = Cards[card1]['Mono colored'] and Cards[card2]['Mono colored']
         card['Colors'] = set(Cards[card1]['Colors']) | set(Cards[card2]['Colors'])
-        card['Rules Text'] = Cards[card1]['Rules Text'] + '\n<---Split--->\n' + Cards[card2]['Rules Text']
+        card['Rules Text'] = Cards[card1]['Rules Text'] + '\n---Split---\n' + Cards[card2]['Rules Text']
         card['Set'] = Cards[card1]['Set'] # Or should I just add the 2 sets together?
-        card['Rarity'] = Cards[card1]['Rarity'] # Or should I just add the 2 rarities together?
+        card['Rarities'] = Cards[card1]['Rarities'] # Or should I just add the 2 rarities together?
         card['Pow/Tgh'] = Cards[card1]['Pow/Tgh'] + ' // ' + Cards[card2]['Pow/Tgh'] # Looks silly on spells
         card['Power'] = Cards[card1]['Power'] + ' // ' + Cards[card2]['Power'] # Max maybe?
-        card['Tougness'] = Cards[card1]['Toughness'] + ' // ' + Cards[card2]['Toughness'] # Max maybe?
-        card['Url'] = Cards[card1]['Url'] + ', ' + Cards[card2]['Url']
-        Cards[cardname] = card
+        card['Toughness'] = Cards[card1]['Toughness'] + ' // ' + Cards[card2]['Toughness'] # Max maybe?
+        card['Url'] = Cards[card1]['Url'] # + ', ' + Cards[card2]['Url'] # They have the same URL...
+        Cards[cardname.strip()] = card
         # Should I delete the single cards? 
+        del Cards[card1]
+        del Cards[card2]
             
 
     # Do split cards --- good to know Cards.keys() is only evaluated once
@@ -218,10 +233,10 @@ def loadOraclefile(fileparameter):
     # Return the dictionary of cards
     return Cards
     
-OracleCards = loadOraclefile('g:\pyDA\Oracle.txt')
+# OracleCards = loadOraclefile('g:\pyDA\Oracle.txt')
 
 # Some test cases
-# '''
+'''
 print OracleCards['Evermind']                           # Funny colored cards
 print OracleCards['Court Hussar']                       # Just a power and toughness test
 print OracleCards['Darksteel Colossus']                 # Funny mana cost, Mythic Rare
@@ -231,5 +246,5 @@ print OracleCards['Crime // Punishment (Crime)']        # Split cards 1 side
 print OracleCards['Crime // Punishment (Punishment)']   # Split cards other side
 print OracleCards['Crime // Punishment']                # Manually combined split card
 print OracleCards['Wrath of God']['Cost']               # How to reference a key within the dictionary
-# '''
-print len(OracleCards)
+'''
+# print len(OracleCards)
