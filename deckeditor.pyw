@@ -18,9 +18,9 @@ class DeckWindow(QtGui.QMainWindow):
         self.connect(self.mainDeck,QtCore.SIGNAL('itemSelectionChanged()'),self.setCard)
         self.connect(self.sideBoard,QtCore.SIGNAL('itemSelectionChanged()'),self.setCard)
         self.connect(self.btnSearch,QtCore.SIGNAL('clicked()'),self.applyFilters)
-        
-       
-        
+        self.connect(self.chkConverted,QtCore.SIGNAL('clicked()'),self.chkConvClicked)
+        self.connect(self.chkSplit,QtCore.SIGNAL('clicked()'),self.chkSplitClicked)
+
         import oracle
         
         self.AllCards = oracle.loadOraclefile('g:\pyDA\Oracle.txt')
@@ -51,6 +51,29 @@ class DeckWindow(QtGui.QMainWindow):
         
         # Who knows... I don't have a Mac
         self.setUnifiedTitleAndToolBarOnMac(True)
+        
+    def chkConvClicked(self):
+        w = self.chkConverted.isChecked()
+        self.fltCostTo.setVisible(w)
+        if w:
+            width = 61
+        else:
+            width = 131
+        self.fltCostFrom.setFixedWidth(width)
+    
+    def chkSplitClicked(self):
+        w = self.chkSplit.isChecked()
+        self.fltPowTo.setVisible(w)
+        self.fltTghFrom.setVisible(w)
+        self.fltTghTo.setVisible(w)
+        self.lblTghTo.setVisible(w)
+        self.lblPowTo.setVisible(w)
+        self.lblPtSlash.setVisible(w)
+        if w:
+            width = 25
+        else:
+            width = 131
+        self.fltPowFrom.setFixedWidth(width)    
     
     def setCard(self):
         widget = self.sender()
@@ -142,12 +165,56 @@ class DeckWindow(QtGui.QMainWindow):
     def applyFilters(self):
         
         def filtered(aCard):
+            # Filter on Card Name
+            test = str(self.fltName.text()).lower()
+            if test != '':
+                if aCard['Name'].lower().find(test) < 0:  
+                    return True
+            
+            # Filter on Card Type
+            test = str(self.fltType.text()).lower()
+            if test != '':
+                if aCard['Type'].lower().find(test) < 0:  
+                    return True
+                        
+            # Filter on Rules Text
+            test = str(self.fltRules.text()).lower()
+            if test != '':
+                
+                def check(haystack,needle):
+                    or_result = False
+                    for t_ors in needle.split(','):
+                        and_result = True
+                        for t_ands in t_ors.split(' '):
+                            and_result = and_result and haystack.lower().find(t_ands) >= 0
+                        or_result = or_result or and_result
+                    return or_result
+                
+                if self.chkRegex.isChecked():
+                    if not check(aCard['Rules Text'],test):
+                        return True
+                else:
+                    if aCard['Rules Text'].lower().find(test) < 0:
+                        return True
+                                
+            # Filter on Mana Cost
+            
+            # Filter on set
+            test = self.fltSet.currentText()
+            if test != 'All':
+                if test not in aCard['Sets']:
+                    return True
+            
             # Filter Rarity
             test = self.fltRarity.currentText()
             if test != 'All':
                 if test not in aCard['Rarities']:
                     return True
             
+            # Filter on Power and Toughness
+            
+            # Filter on Color
+                
             
             return False
         

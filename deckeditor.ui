@@ -76,7 +76,7 @@
         <bool>true</bool>
        </property>
       </widget>
-      <widget class="QCheckBox" name="chkLogical">
+      <widget class="QCheckBox" name="chkRegex">
        <property name="geometry">
         <rect>
          <x>148</x>
@@ -84,6 +84,10 @@
          <width>72</width>
          <height>20</height>
         </rect>
+       </property>
+       <property name="toolTip">
+        <string>Search with , as ors and spaces as ands.
+Example: flying haste, flying first strike</string>
        </property>
        <property name="text">
         <string>Logical</string>
@@ -161,7 +165,7 @@
         <string>Card Type</string>
        </property>
       </widget>
-      <widget class="QLineEdit" name="fltManaFrom">
+      <widget class="QLineEdit" name="fltCostFrom">
        <property name="geometry">
         <rect>
          <x>210</x>
@@ -337,7 +341,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QCheckBox" name="checkBox_19">
+       <widget class="QCheckBox" name="chkExclude">
         <property name="geometry">
          <rect>
           <x>90</x>
@@ -350,7 +354,7 @@
          <string>Exclude unselected colors</string>
         </property>
        </widget>
-       <widget class="QCheckBox" name="checkBox_20">
+       <widget class="QCheckBox" name="chkAny">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -380,7 +384,7 @@
         </property>
        </widget>
       </widget>
-      <widget class="QLineEdit" name="fltManaTo">
+      <widget class="QLineEdit" name="fltCostTo">
        <property name="geometry">
         <rect>
          <x>280</x>
@@ -439,7 +443,7 @@
         <bool>true</bool>
        </property>
       </widget>
-      <widget class="QLineEdit" name="fltPwFrom">
+      <widget class="QLineEdit" name="fltPowFrom">
        <property name="geometry">
         <rect>
          <x>210</x>
@@ -449,7 +453,7 @@
         </rect>
        </property>
       </widget>
-      <widget class="QLineEdit" name="fltPwTo">
+      <widget class="QLineEdit" name="fltPowTo">
        <property name="geometry">
         <rect>
          <x>245</x>
@@ -470,6 +474,15 @@
        </property>
        <property name="text">
         <string>Search</string>
+       </property>
+       <property name="shortcut">
+        <string>Return</string>
+       </property>
+       <property name="autoDefault">
+        <bool>true</bool>
+       </property>
+       <property name="default">
+        <bool>true</bool>
        </property>
       </widget>
       <widget class="QPushButton" name="btnClear">
@@ -498,20 +511,20 @@
       <widget class="QLineEdit" name="fltTghTo">
        <property name="geometry">
         <rect>
-         <x>315</x>
+         <x>316</x>
          <y>125</y>
          <width>25</width>
          <height>20</height>
         </rect>
        </property>
       </widget>
-      <widget class="QLabel" name="label_14">
+      <widget class="QLabel" name="lblPtSlash">
        <property name="geometry">
         <rect>
          <x>263</x>
-         <y>128</y>
+         <y>126</y>
          <width>24</width>
-         <height>16</height>
+         <height>17</height>
         </rect>
        </property>
        <property name="text">
@@ -521,7 +534,7 @@
         <set>Qt::AlignCenter</set>
        </property>
       </widget>
-      <widget class="QLabel" name="label_7">
+      <widget class="QLabel" name="lblPowTo">
        <property name="geometry">
         <rect>
          <x>210</x>
@@ -537,7 +550,7 @@
         <set>Qt::AlignCenter</set>
        </property>
       </widget>
-      <widget class="QLabel" name="label_21">
+      <widget class="QLabel" name="lblTghTo">
        <property name="geometry">
         <rect>
          <x>281</x>
@@ -938,14 +951,14 @@ p, li { white-space: pre-wrap; }
   <tabstop>fltName</tabstop>
   <tabstop>fltType</tabstop>
   <tabstop>fltRules</tabstop>
-  <tabstop>chkLogical</tabstop>
-  <tabstop>fltManaFrom</tabstop>
-  <tabstop>fltManaTo</tabstop>
+  <tabstop>chkRegex</tabstop>
+  <tabstop>fltCostFrom</tabstop>
+  <tabstop>fltCostTo</tabstop>
   <tabstop>chkConverted</tabstop>
   <tabstop>fltSet</tabstop>
   <tabstop>fltRarity</tabstop>
-  <tabstop>fltPwFrom</tabstop>
-  <tabstop>fltPwTo</tabstop>
+  <tabstop>fltPowFrom</tabstop>
+  <tabstop>fltPowTo</tabstop>
   <tabstop>fltTghFrom</tabstop>
   <tabstop>fltTghTo</tabstop>
   <tabstop>chkSplit</tabstop>
@@ -971,9 +984,154 @@ p, li { white-space: pre-wrap; }
   <tabstop>chkGold</tabstop>
   <tabstop>chkColorless</tabstop>
   <tabstop>chkLand</tabstop>
-  <tabstop>checkBox_20</tabstop>
-  <tabstop>checkBox_19</tabstop>
+  <tabstop>chkAny</tabstop>
+  <tabstop>chkExclude</tabstop>
  </tabstops>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>btnClear</sender>
+   <signal>clicked()</signal>
+   <receiver>fltRules</receiver>
+   <slot>clear()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>135</x>
+     <y>199</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>122</x>
+     <y>162</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnClear</sender>
+   <signal>clicked()</signal>
+   <receiver>fltType</receiver>
+   <slot>clear()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>160</x>
+     <y>189</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>120</x>
+     <y>113</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnClear</sender>
+   <signal>clicked()</signal>
+   <receiver>fltName</receiver>
+   <slot>clear()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>143</x>
+     <y>188</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>127</x>
+     <y>64</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnClear</sender>
+   <signal>clicked()</signal>
+   <receiver>fltCostFrom</receiver>
+   <slot>clear()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>177</x>
+     <y>185</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>230</x>
+     <y>64</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnClear</sender>
+   <signal>clicked()</signal>
+   <receiver>fltCostTo</receiver>
+   <slot>clear()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>144</x>
+     <y>186</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>297</x>
+     <y>63</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnClear</sender>
+   <signal>clicked()</signal>
+   <receiver>fltPowFrom</receiver>
+   <slot>clear()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>108</x>
+     <y>192</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>236</x>
+     <y>152</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnClear</sender>
+   <signal>clicked()</signal>
+   <receiver>fltPowTo</receiver>
+   <slot>clear()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>142</x>
+     <y>194</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>263</x>
+     <y>161</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnClear</sender>
+   <signal>clicked()</signal>
+   <receiver>fltTghFrom</receiver>
+   <slot>clear()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>142</x>
+     <y>194</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>298</x>
+     <y>161</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnClear</sender>
+   <signal>clicked()</signal>
+   <receiver>fltTghTo</receiver>
+   <slot>clear()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>142</x>
+     <y>194</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>333</x>
+     <y>161</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

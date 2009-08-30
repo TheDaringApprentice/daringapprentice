@@ -65,12 +65,13 @@ def loadOraclefile(fileparameter):
             
             # Take everything up to the last newline (or all if no more newlines were found)
             Tails.append(aTail[0:lastchar].replace('\n',' '))
+            # HELP! See below:
             # This kinda sucks... some \n chars are intentional, and some are just the break.
             # We either take it with the line breaks, and get weird breaks, or without them
             # and we sit with activation costs not at the start of the card.  Maybe some
-            # more data cleaning before we run?  
-            
-            
+            # more data cleaning before we run?
+            # See Academy Ruins for example... 1st \n is for the card's test, and 2nd is just
+            # a line break... :-/
         
         # Empty dictionary
         card = {}
