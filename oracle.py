@@ -171,9 +171,9 @@ def loadOraclefile(fileparameter):
             for aSet in s:
                 Sets = Sets + [aSet.rpartition(' ')[0].strip()]
                 Rarities = Rarities + [aSet.rpartition(' ')[2].strip().replace('_',' ')]
-            card['Set'] = Sets
+            card['Sets'] = Sets
             card['Rarities'] = Rarities
-            # card['Rarity'] = Rarities[len(Rarities)-1]  # I decided I don't need Rarities
+            # card['Rarity'] = Rarities[len(Rarities)-1]  # I decided I don't need a latest Rarity
             del card['Set/Rarity']
         
         if 'Pow/Tgh' in card:
@@ -213,7 +213,7 @@ def loadOraclefile(fileparameter):
         card['Mono colored'] = Cards[card1]['Mono colored'] and Cards[card2]['Mono colored']
         card['Colors'] = set(Cards[card1]['Colors']) | set(Cards[card2]['Colors'])
         card['Rules Text'] = Cards[card1]['Rules Text'] + '\n---Split---\n' + Cards[card2]['Rules Text']
-        card['Set'] = Cards[card1]['Set'] # Or should I just add the 2 sets together?
+        card['Sets'] = Cards[card1]['Sets'] # Or should I just add the 2 sets together?
         card['Rarities'] = Cards[card1]['Rarities'] # Or should I just add the 2 rarities together?
         card['Pow/Tgh'] = Cards[card1]['Pow/Tgh'] + ' // ' + Cards[card2]['Pow/Tgh'] # Looks silly on spells
         card['Power'] = Cards[card1]['Power'] + ' // ' + Cards[card2]['Power'] # Max maybe?
@@ -231,6 +231,7 @@ def loadOraclefile(fileparameter):
             CreateSplitcard(aName)
     
     # Return the dictionary of cards
+    print len(Cards)
     return Cards
     
 # OracleCards = loadOraclefile('g:\pyDA\Oracle.txt')

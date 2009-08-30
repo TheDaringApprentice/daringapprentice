@@ -390,7 +390,7 @@
         </rect>
        </property>
       </widget>
-      <widget class="QComboBox" name="fltSets">
+      <widget class="QComboBox" name="fltSet">
        <property name="geometry">
         <rect>
          <x>210</x>
@@ -942,7 +942,7 @@ p, li { white-space: pre-wrap; }
   <tabstop>fltManaFrom</tabstop>
   <tabstop>fltManaTo</tabstop>
   <tabstop>chkConverted</tabstop>
-  <tabstop>fltSets</tabstop>
+  <tabstop>fltSet</tabstop>
   <tabstop>fltRarity</tabstop>
   <tabstop>fltPwFrom</tabstop>
   <tabstop>fltPwTo</tabstop>

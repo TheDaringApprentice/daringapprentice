@@ -17,6 +17,8 @@ class DeckWindow(QtGui.QMainWindow):
         self.connect(self.cardList,QtCore.SIGNAL('itemSelectionChanged()'),self.setCard)
         self.connect(self.mainDeck,QtCore.SIGNAL('itemSelectionChanged()'),self.setCard)
         self.connect(self.sideBoard,QtCore.SIGNAL('itemSelectionChanged()'),self.setCard)
+        self.connect(self.btnSearch,QtCore.SIGNAL('clicked()'),self.applyFilters)
+        
        
         
         import oracle
@@ -24,13 +26,28 @@ class DeckWindow(QtGui.QMainWindow):
         self.AllCards = oracle.loadOraclefile('g:\pyDA\Oracle.txt')
         
         list = []
+        sets = []
+        rarities = []
+       
         for s in self.AllCards.keys():
-            list += [s]                     
-                
-        for s in sorted(list,cmp=lambda x,y: cmp(x.lower(), y.lower())):
-            self.cardList.addItem(s)
+            list += [s]
+            sets += self.AllCards[s]['Sets']
+            rarities += self.AllCards[s]['Rarities']
         
+        rarities = set(rarities)
+        sets = set(sets)
         
+        self.statusbar.showMessage(str(len(list)))
+        
+        self.cardList.addItems(sorted(list,cmp=lambda x,y: cmp(x.lower(), y.lower())))
+        self.fltRarity.addItems(sorted(rarities,cmp=lambda x,y: cmp(x.lower(), y.lower())))
+        self.fltSet.addItems(sorted(sets,cmp=lambda x,y: cmp(x.lower(), y.lower())))
+        
+        self.fltSet.insertItem(0,"All")
+        self.fltRarity.insertItem(0,"All")
+        
+        self.fltSet.setCurrentIndex(0)
+        self.fltRarity.setCurrentIndex(0)
         
         # Who knows... I don't have a Mac
         self.setUnifiedTitleAndToolBarOnMac(True)
@@ -38,7 +55,10 @@ class DeckWindow(QtGui.QMainWindow):
     def setCard(self):
         widget = self.sender()
         
-        aName = widget.currentItem().text()
+        if widget.metaObject().className() == 'QListWidget':
+            aName = widget.currentItem().text()
+        if widget.metaObject().className() == 'QTreeWidget':
+            aName = widget.currentItem().text(0)
         aName = str(aName).decode()
         text = ''
         text = '<b>' + self.AllCards[aName]['Name'] + '&nbsp;&nbsp;&nbsp;'\
@@ -47,7 +67,7 @@ class DeckWindow(QtGui.QMainWindow):
          + self.AllCards[aName]['Rules Text'].replace('\n','<br>') + '<br>'\
          + self.AllCards[aName]['Pow/Tgh'] + '<br>'\
          + '<HR>'\
-         + 'Sets : ' + str(self.AllCards[aName]['Set']).strip("[]") + '<br>'\
+         + 'Sets : ' + str(self.AllCards[aName]['Sets']).strip("[]") + '<br>'\
          + 'Rarities: ' + str(self.AllCards[aName]['Rarities']).strip("[]")+ '<br>'\
          + 'Colors : ' + str(self.AllCards[aName]['Colors'])  + '<br>'\
          + 'Mono Colored : ' + str(self.AllCards[aName]['Mono colored']) + '<br>'\
@@ -118,6 +138,28 @@ class DeckWindow(QtGui.QMainWindow):
         self.gameToolBar.addAction(self.saveAct)
         self.gameToolBar.addAction(self.saveAsAct)
         self.gameToolBar.addAction(self.quitAct)
+        
+    def applyFilters(self):
+        
+        def filtered(aCard):
+            # Filter Rarity
+            test = self.fltRarity.currentText()
+            if test != 'All':
+                if test not in aCard['Rarities']:
+                    return True
+            
+            
+            return False
+        
+        list = []
+        for card in self.AllCards.keys():
+            aCard = self.AllCards[card]
+            if not filtered(aCard):
+                list += [card]
+        
+        self.cardList.clear()
+        self.cardList.addItems(sorted(list,cmp=lambda x,y: cmp(x.lower(), y.lower())))
+        self.statusbar.showMessage(str(len(list)))
         
 
 if __name__ == '__main__':
