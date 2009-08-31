@@ -14,32 +14,41 @@ class DeckWindow(QtGui.QMainWindow):
         self.createToolBars()
         
         # connect some slots and signals...
+        self.connect(self.cardFilter,QtCore.SIGNAL('textChanged(QString)'),self.jumpCard)
         self.connect(self.cardList,QtCore.SIGNAL('itemSelectionChanged()'),self.setCard)
         self.connect(self.mainDeck,QtCore.SIGNAL('itemSelectionChanged()'),self.setCard)
         self.connect(self.sideBoard,QtCore.SIGNAL('itemSelectionChanged()'),self.setCard)
         self.connect(self.btnSearch,QtCore.SIGNAL('clicked()'),self.applyFilters)
         self.connect(self.chkConverted,QtCore.SIGNAL('clicked()'),self.chkConvClicked)
         self.connect(self.chkSplit,QtCore.SIGNAL('clicked()'),self.chkSplitClicked)
-
+        self.connect(self.chkAny,QtCore.SIGNAL('clicked()'),self.chkAnyClicked)
+        
+        self.chkAnyClicked()
+        
+        # self.mainDeck.__class__.dropEvent = self.dropEvent
+        # self.cardList.__class__
+        
         import oracle
         
         self.AllCards = oracle.loadOraclefile('g:\pyDA\Oracle.txt')
         
-        list = []
+        self.list = []
         sets = []
         rarities = []
        
         for s in self.AllCards.keys():
-            list += [s]
+            self.list += [s]
             sets += self.AllCards[s]['Sets']
             rarities += self.AllCards[s]['Rarities']
         
         rarities = set(rarities)
         sets = set(sets)
         
-        self.statusbar.showMessage(str(len(list)))
+        self.statusbar.showMessage(str(len(self.list)) + ' / ' + str(len(self.AllCards)))
         
-        self.cardList.addItems(sorted(list,cmp=lambda x,y: cmp(x.lower(), y.lower())))
+        self.list = sorted(self.list,cmp=lambda x,y: cmp(x.lower(), y.lower()))
+        
+        self.cardList.addItems(self.list)
         self.fltRarity.addItems(sorted(rarities,cmp=lambda x,y: cmp(x.lower(), y.lower())))
         self.fltSet.addItems(sorted(sets,cmp=lambda x,y: cmp(x.lower(), y.lower())))
         
@@ -51,6 +60,44 @@ class DeckWindow(QtGui.QMainWindow):
         
         # Who knows... I don't have a Mac
         self.setUnifiedTitleAndToolBarOnMac(True)
+    
+    def jumpCard(self,s):
+        
+        def anIndex(s,aList):
+            i = 0
+            for aName in aList:
+                if s.lower() < aName.lower():
+                    return i
+                i = i + 1
+        
+        index = anIndex(str(s), self.list)
+        # print s + ', ' + str(index)
+        self.cardList.setCurrentRow(index)
+        
+    def dropEvent(self, event):
+        print event.mimeData().hasText()
+        print event.mimeData().hasImage()
+        print event.mimeData().hasColor()
+        print event.mimeData().hasHtml()
+        print event.mimeData().hasUrls()
+        
+        
+            
+    def chkAnyClicked(self):
+        w = self.chkAny.isChecked()
+        self.chkWhite.setEnabled(not w)
+        self.chkBlue.setEnabled(not w)
+        self.chkBlack.setEnabled(not w)
+        self.chkRed.setEnabled(not w)
+        self.chkGreen.setEnabled(not w)
+        self.chkGold.setEnabled(not w)
+        self.chkColorless.setEnabled(not w)
+        self.chkLand.setEnabled(not w)
+        self.chkExclude.setEnabled(not w)
+        
+        
+        
+        
         
     def chkConvClicked(self):
         w = self.chkConverted.isChecked()
@@ -93,7 +140,7 @@ class DeckWindow(QtGui.QMainWindow):
          + 'Sets : ' + str(self.AllCards[aName]['Sets']).strip("[]") + '<br>'\
          + 'Rarities: ' + str(self.AllCards[aName]['Rarities']).strip("[]")+ '<br>'\
          + 'Colors : ' + str(self.AllCards[aName]['Colors'])  + '<br>'\
-         + 'Mono Colored : ' + str(self.AllCards[aName]['Mono colored']) + '<br>'\
+         + 'Hybrid Only : ' + str(self.AllCards[aName]['Only Hybrid']) + '<br>'\
          + 'Converted Cost : ' + str(self.AllCards[aName]['Converted Cost']) + '<br>'\
          + 'Power : ' + self.AllCards[aName]['Power'] + '<br>Toughness : ' + self.AllCards[aName]['Toughness']\
          + '<HR>' \
@@ -253,19 +300,40 @@ class DeckWindow(QtGui.QMainWindow):
                         return True
            
             # Filter on Color
+            if not self.chkAny.isChecked():
+                Colors = dict({'White':self.chkWhite, 'Blue':self.chkBlue, 'Black':self.chkBlack,
+                               'Red':self.chkRed, 'Green':self.chkGreen, 'Gold':self.chkGold,
+                               'Colorless':self.chkColorless, 'Land':self.chkLand})
                 
+                SelCols = set([])
+                for key in Colors.keys():
+                    if Colors[key].isChecked():
+                        SelCols = SelCols | set([key])
+                
+                if self.chkExclude.isChecked():
+                    if aCard['Only Hybrid']:
+                        if SelCols.isdisjoint(aCard['Colors']):
+                            return True
+                    else:
+                        if not SelCols >= aCard['Colors']:
+                            return True    
+                else:
+                    if SelCols.isdisjoint(aCard['Colors']):
+                        return True
             
             return False
         
-        list = []
+        self.list = []
         for card in self.AllCards.keys():
             aCard = self.AllCards[card]
             if not filtered(aCard):
-                list += [card]
+                self.list += [card]
+                
+        self.list = sorted(self.list,cmp=lambda x,y: cmp(x.lower(), y.lower()))
         
         self.cardList.clear()
-        self.cardList.addItems(sorted(list,cmp=lambda x,y: cmp(x.lower(), y.lower())))
-        self.statusbar.showMessage(str(len(list)))
+        self.cardList.addItems(self.list)
+        self.statusbar.showMessage(str(len(self.list)) + ' / ' + str(len(self.AllCards)))
         
 
 if __name__ == '__main__':

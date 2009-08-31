@@ -117,11 +117,13 @@ def loadOraclefile(fileparameter):
             card['Colors'] = color
             
             
-            # Do we need mono colored?  It may be useful in searching
+            # Do we need mono colored?  It may be useful in searching  (I'll be using Only Hybrid)
+            '''
             if len(color) == 1:
                 card['Mono colored'] = True
             else:
                 card['Mono colored'] = False
+            '''
             
             # Calculate Converted Cost
             '''
@@ -133,6 +135,7 @@ def loadOraclefile(fileparameter):
                 counts as 1. 
             '''
             cc = 0
+            hasonlymulti = True
             inmulti = False
             firstinmulti = True
             cs = ''
@@ -152,14 +155,23 @@ def loadOraclefile(fileparameter):
                                     firstinmulti = False
                             else:
                                 cc += 1
+                                hasonlymulti = False
                         if ch in ['(','{']:
                             inmulti = True
                             firstinmulti = True
                         if ch in [')',')']:
                             inmulti = False
+            
+            if hasonlymulti:
+                card['Only Hybrid'] = True
+            else:
+                card['Only Hybrid'] = False
+            
+            
             if cs != '':
                 cc += int(cs)
             card['Converted Cost'] = cc
+            
                 
         if 'Set/Rarity' in card:
             # For MTG, do some special work around Mythic Rares and Timeshifted Special cards
@@ -215,7 +227,7 @@ def loadOraclefile(fileparameter):
         card['Cost'] = Cards[card1]['Cost'] + ' // ' + Cards[card2]['Cost']
         card['Type'] = Cards[card1]['Type'] + ' // ' + Cards[card2]['Type']
         card['Converted Cost'] = Cards[card1]['Converted Cost'] + Cards[card2]['Converted Cost']
-        card['Mono colored'] = Cards[card1]['Mono colored'] and Cards[card2]['Mono colored']
+        card['Only Hybrid'] = Cards[card1]['Only Hybrid'] and Cards[card2]['Only Hybrid']
         card['Colors'] = set(Cards[card1]['Colors']) | set(Cards[card2]['Colors'])
         card['Rules Text'] = Cards[card1]['Rules Text'] + '\n---Split---\n' + Cards[card2]['Rules Text']
         card['Sets'] = Cards[card1]['Sets'] # Or should I just add the 2 sets together?
