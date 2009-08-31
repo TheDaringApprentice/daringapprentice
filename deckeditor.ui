@@ -521,9 +521,9 @@ Example: flying haste, flying first strike</string>
       <widget class="QLabel" name="lblPtSlash">
        <property name="geometry">
         <rect>
-         <x>263</x>
+         <x>270</x>
          <y>126</y>
-         <width>24</width>
+         <width>12</width>
          <height>17</height>
         </rect>
        </property>
@@ -537,9 +537,9 @@ Example: flying haste, flying first strike</string>
       <widget class="QLabel" name="lblPowTo">
        <property name="geometry">
         <rect>
-         <x>210</x>
+         <x>234</x>
          <y>129</y>
-         <width>61</width>
+         <width>12</width>
          <height>20</height>
         </rect>
        </property>
@@ -553,9 +553,9 @@ Example: flying haste, flying first strike</string>
       <widget class="QLabel" name="lblTghTo">
        <property name="geometry">
         <rect>
-         <x>281</x>
+         <x>305</x>
          <y>129</y>
-         <width>61</width>
+         <width>12</width>
          <height>20</height>
         </rect>
        </property>

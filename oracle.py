@@ -183,7 +183,11 @@ def loadOraclefile(fileparameter):
                 card['Power'],card['Toughness'] = s[0],s[1]
             else:
                 card['Power'],card['Toughness'] = '0','0'  # Assumed?!  Is there any cards without the / in the P/T?
-            # Delete the P/T?  
+            # Delete the P/T?
+        else:  # For some reason planeswalkers don't have P/T in the base file?!
+            card['Pow/Tgh'] = ''
+            card['Power'] = '0'
+            card['Toughness'] = '0'
         return card
     
     # Main loop - gets all the cards, and runs "GetCard" to get all the info

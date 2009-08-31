@@ -198,6 +198,17 @@ class DeckWindow(QtGui.QMainWindow):
                         return True
                                 
             # Filter on Mana Cost
+            test = self.fltCostFrom.text()
+            if test != '':
+                if self.chkConverted.isChecked():
+                    test2 = self.fltCostTo.text()
+                    if test2 == "":
+                        test2 = test
+                    if int(aCard['Converted Cost']) < int(test) or int(aCard['Converted Cost']) > int(test2):
+                        return True
+                else:
+                    if aCard['Cost'].lower() != str(test).lower():
+                        return True
             
             # Filter on set
             test = self.fltSet.currentText()
@@ -210,9 +221,37 @@ class DeckWindow(QtGui.QMainWindow):
             if test != 'All':
                 if test not in aCard['Rarities']:
                     return True
-            
-            # Filter on Power and Toughness
-            
+                
+            def toint(s):
+                try:
+                    i = int(s)
+                except ValueError:
+                    i = 0
+                return i
+                
+            # Filter on Power and Toughness            
+            test = self.fltPowFrom.text()
+            if test != '':
+                if self.chkSplit.isChecked():
+                    if 'Power' not in aCard:
+                        print aCard
+                    test2 = self.fltPowTo.text()
+                    if test2 == "":
+                        test2 = test
+                    if toint(aCard['Power']) < toint(test) or toint(aCard['Power']) > toint(test2):
+                        return True
+                else:
+                    if aCard['Pow/Tgh'].lower().strip('()[]{}') != str(test).lower():
+                        return True
+            test = self.fltTghFrom.text()
+            if test != '':
+                if self.chkSplit.isChecked():
+                    test2 = self.fltTghTo.text()
+                    if test2 == "":
+                        test2 = test
+                    if toint(aCard['Toughness']) < toint(test) or toint(aCard['Toughness']) > toint(test2):
+                        return True
+           
             # Filter on Color
                 
             
