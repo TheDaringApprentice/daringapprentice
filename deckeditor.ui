@@ -804,7 +804,7 @@ Example: flying haste, flying first strike</string>
           </widget>
          </item>
          <item>
-          <widget class="QTreeWidget" name="mainDeck">
+          <widget class="QTreeView" name="mainDeck">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
              <horstretch>0</horstretch>
@@ -826,19 +826,6 @@ Example: flying haste, flying first strike</string>
            <property name="itemsExpandable">
             <bool>false</bool>
            </property>
-           <attribute name="headerDefaultSectionSize">
-            <number>120</number>
-           </attribute>
-           <column>
-            <property name="text">
-             <string notr="true">Card</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>Amount</string>
-            </property>
-           </column>
           </widget>
          </item>
          <item>
@@ -852,7 +839,7 @@ Example: flying haste, flying first strike</string>
           </widget>
          </item>
          <item>
-          <widget class="QTreeWidget" name="sideBoard">
+          <widget class="QTreeView" name="sideBoard">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
              <horstretch>0</horstretch>
@@ -874,19 +861,6 @@ Example: flying haste, flying first strike</string>
            <property name="itemsExpandable">
             <bool>false</bool>
            </property>
-           <attribute name="headerDefaultSectionSize">
-            <number>120</number>
-           </attribute>
-           <column>
-            <property name="text">
-             <string>Card</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>Amount</string>
-            </property>
-           </column>
           </widget>
          </item>
         </layout>
